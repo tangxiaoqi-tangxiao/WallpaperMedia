@@ -1,0 +1,10 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+# 过滤ide配置
+.idea
+.vs
+# 过滤本地配置文件
+*.user
