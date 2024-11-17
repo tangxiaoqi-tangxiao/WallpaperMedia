@@ -19,11 +19,11 @@
     </Design.DataContext>
 
     <Window.Styles>
-        <Style Selector="DataGridCell">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-        </Style>
+        <!-- <Style Selector="DataGridCell"> -->
+        <!--     <Setter Property="HorizontalAlignment" Value="Center" /> -->
+        <!--     <Setter Property="VerticalAlignment" Value="Center" /> -->
+        <!--     <Setter Property="HorizontalContentAlignment" Value="Center" /> -->
+        <!-- </Style> -->
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="10 25 10 10">
