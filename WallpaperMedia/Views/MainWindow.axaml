@@ -8,7 +8,7 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="WallpaperMedia"
-        Background="White"
+        Background="#222222"
         ExtendClientAreaToDecorationsHint="True"
         WindowStartupLocation="CenterScreen">
 
@@ -26,47 +26,62 @@
         <!-- </Style> -->
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,*,Auto" Margin="10 25 10 10">
+    <Grid RowDefinitions="*,Auto" Margin="10 25 10 10">
         <!-- 顶部按钮 -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
-            <Button Content="添加文件" Margin="0,0,10,0" />
-            <Button Content="添加文件夹" Margin="0,0,10,0" />
-            <Button Content="清空列表" />
-        </StackPanel>
+        <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10"> -->
+        <!--     <Button Content="添加文件" Margin="0,0,10,0" /> -->
+        <!--     <Button Content="添加文件夹" Margin="0,0,10,0" /> -->
+        <!--     <Button Content="清空列表" /> -->
+        <!-- </StackPanel> -->
 
         <!-- 文件列表 -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="FileList">
-                <Grid x:Name="DynamicGrid" AttachedToVisualTree="OnGridLoaded">
-                    <!-- 定义四列 -->
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </StackPanel>
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding FileItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="180" Height="180" Margin="10" Background="#333">
+                            <Grid>
+                                <!-- 图像层 -->
+                                <Image Source="{Binding ThumbnailBitmap}" Stretch="UniformToFill"/>
+                                <!-- 覆盖在图像上的文字层 -->
+                                <TextBlock Text="{Binding Title}" 
+                                           HorizontalAlignment="Stretch" 
+                                           VerticalAlignment="Bottom" 
+                                           Foreground="White" 
+                                           TextAlignment="Center"
+                                           FontSize="16" 
+                                           Background="#99000000" 
+                                           Padding="5"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
 
         <!-- 底部按钮 -->
-        <Grid Grid.Row="2" RowDefinitions="Auto" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+        <Grid Grid.Row="1" RowDefinitions="Auto" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
             <DockPanel LastChildFill="False">
                 <!-- 导出格式选择 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0"
                             DockPanel.Dock="Left">
-                    <TextBlock Text="导出格式:" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="导出格式:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <ComboBox Width="100" SelectedIndex="0">
                         <ComboBoxItem Content="MP3" />
                         <ComboBoxItem Content="WAV" />
                         <!-- 添加其他格式 -->
                     </ComboBox>
                 </StackPanel>
-
+        
                 <!-- 质量选择 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                             Margin="0,0,20,0" DockPanel.Dock="Left">
-                    <TextBlock Text="导出类型:" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="导出类型:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <ComboBox Width="100" SelectedIndex="0">
                         <ComboBoxItem Content="全部" />
                         <ComboBoxItem Content="视频" />
@@ -74,18 +89,17 @@
                         <!-- 添加其他质量选项 -->
                     </ComboBox>
                 </StackPanel>
-
+        
                 <!-- 输出目录 -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
                             VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left">
-                    <TextBlock Text="输出目录:" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="输出目录:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <TextBox Width="200" Name="OutputDirectory" />
                     <Button Content="..." Width="30" />
                 </StackPanel>
-
-
-                <!-- 开始转换按钮 -->
-                <Button Content="开始转换" Background="Orange" Foreground="White"
+        
+                <!-- 导出选中项 -->
+                <Button Content="导出选中项" Background="#4183f5" Foreground="White"
                         HorizontalAlignment="Right" DockPanel.Dock="Right" />
             </DockPanel>
         </Grid>

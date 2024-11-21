@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using WallpaperMedia.Services;
 using WallpaperMedia.ViewModels.MainModels;
 
 namespace WallpaperMedia.Views;
