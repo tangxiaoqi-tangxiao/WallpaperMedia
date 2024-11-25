@@ -1,8 +1,16 @@
 using System;
 using System.Collections.Generic;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using WallpaperMedia.Configs;
 using WallpaperMedia.Services;
+using WallpaperMedia.ViewModels;
 using WallpaperMedia.ViewModels.MainModels;
 
 namespace WallpaperMedia.Views;
@@ -11,11 +19,13 @@ public partial class MainWindow : Window
 {
     public MainWindow()
     {
+        // 必须初始化XAML中的控件
         InitializeComponent();
-
         //初始化
         Initialize();
     }
+
+    private MainWindowViewModel _ViewModel => DataContext as MainWindowViewModel;
 
     public void Initialize()
     {
@@ -33,63 +43,124 @@ public partial class MainWindow : Window
         this.Height = height;
         this.MinWidth = minWidth;
         this.MinHeight = minHeight;
+
+        InitializeEvent();
     }
 
-    private void OnGridLoaded(object sender, VisualTreeAttachmentEventArgs e)
+    //初始化事件
+    private void InitializeEvent()
     {
-        // 确保事件只执行一次
-        if (sender is Grid grid)
-        {
-            // 添加标题行
-            AddHeaderRow(grid);
+        // 监听窗口大小变化事件
+        this.SizeChanged += OnSizeChanged;
+        this.Loaded += MainWindow_Loaded;
+        OutputDirectory.TextChanged += OnTextChanged;
+    }
 
-            // 自动添加10行数据
-            for (int i = 0; i < 100; i++)
-            {
-                AddRow(i + 1, grid);
-            }
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        // 在这里处理ViewModel初始化完成后的逻辑
+        BuildContentComponent();
+        OutputDirectory.Text = _ViewModel._DownloadsPath;
+    }
+
+    private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        var newWidth = e.NewSize.Width;
+        // 使用 FindControl 确保获取到控件
+        if (GridContentColumn == null)
+            return;
+        // 动态调整列数
+        if (newWidth <= ScreenSize.Md)
+        {
+            GridContentColumn.Columns = 3;
+        }
+        else if (newWidth <= ScreenSize.Lg)
+        {
+            GridContentColumn.Columns = 4;
+        }
+        else if (newWidth <= ScreenSize.Xl)
+        {
+            GridContentColumn.Columns = 5;
+        }
+        else if (newWidth <= ScreenSize.Xxl)
+        {
+            GridContentColumn.Columns = 6;
+        }
+        else if (newWidth <= ScreenSize.Xxxxl)
+        {
+            GridContentColumn.Columns = 7;
+        }
+        else
+        {
+            GridContentColumn.Columns = 8;
         }
     }
 
-    private void AddHeaderRow(Grid grid)
+    private void BuildContentComponent()
     {
-        // 添加标题行
-        var titles = new[] { "Title 1", "Title 2", "Title 3", "Title 4" };
-        for (int i = 0; i < titles.Length; i++)
+        GridContentColumn.Children.Clear();
+        foreach (var viewModelFileItem in _ViewModel._FileItems)
         {
-            var header = new TextBlock
+            Border border = new();
+            Image image = new();
+            Grid grid = new();
+            TextBlock textBlock = new();
+            border.HorizontalAlignment = HorizontalAlignment.Stretch;
+            border.Margin = new Thickness(10);
+            border.Background = new SolidColorBrush(Color.Parse("#333")); //自定义颜色#333
+            border.ClipToBounds = true; // 超出部分裁剪
+            border.PointerPressed += (sender, e) =>
             {
-                Text = titles[i],
-                FontWeight = Avalonia.Media.FontWeight.Bold,
-                Margin = new Thickness(5),
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center
-            };
-            Grid.SetColumn(header, i);
-            Grid.SetRow(header, 0);
-            grid.Children.Add(header);
-        }
+                // 获取鼠标按键状态
+                var pointerPoint = e.GetCurrentPoint(border);
+                if (pointerPoint.Properties.IsLeftButtonPressed) // 判断是否为左键单击
+                {
+                    // 单击事件逻辑：切换边框颜色
+                    if (border.BorderBrush == null || border.BorderBrush.Equals(Brushes.Transparent))
+                    {
+                        border.BorderBrush = new SolidColorBrush(Color.Parse("#4183f5")); // 设置边框为蓝色
+                        border.BorderThickness = new Thickness(2); // 设置边框宽度
+                        viewModelFileItem.Selected = true;
+                    }
+                    else
+                    {
+                        border.BorderBrush = Brushes.Transparent; // 取消边框颜色
+                        border.BorderThickness = new Thickness(0);
+                        viewModelFileItem.Selected = false;
+                    }
+                }
 
-        // 添加行定义
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                // 在这里处理单击事件的逻辑
+                Console.WriteLine($"Clicked on: {viewModelFileItem.Title}");
+                // 可以在这里执行任何其他操作，例如导航、弹出消息等
+            };
+
+            border.Child = grid;
+
+            image.Stretch = Stretch.UniformToFill;
+            image.Source = viewModelFileItem.ThumbnailBitmap;
+            image.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative); // 以中心为基点
+            grid.Children.Add(image);
+
+            textBlock.Text = viewModelFileItem.Title;
+            textBlock.TextAlignment = TextAlignment.Center;
+            textBlock.HorizontalAlignment = HorizontalAlignment.Stretch;
+            textBlock.VerticalAlignment = VerticalAlignment.Bottom;
+            textBlock.Foreground = Brushes.White;
+            textBlock.FontSize = 14;
+            textBlock.Background = new SolidColorBrush(Color.Parse("#99000000")); //自定义颜色#99000000
+            textBlock.Padding = new Thickness(5);
+            grid.Children.Add(textBlock);
+
+            GridContentColumn.Children.Add(border);
+        }
     }
 
-    private void AddRow(int index, Grid grid)
+    private void OnTextChanged(object? sender, RoutedEventArgs e)
     {
-        // 添加新行定义
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-        // 在该行添加四列数据
-        for (int i = 0; i < 4; i++)
+        if (sender is TextBox textBox)
         {
-            var cell = new TextBlock
-            {
-                Text = $"Row {index}, Col {i + 1}",
-                Margin = new Thickness(5),
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center
-            };
-            Grid.SetColumn(cell, i);
-            Grid.SetRow(cell, index);
-            grid.Children.Add(cell);
+            textBox.Text = _ViewModel._DownloadsPath;
         }
     }
 }

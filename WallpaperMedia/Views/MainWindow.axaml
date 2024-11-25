@@ -9,8 +9,9 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="WallpaperMedia"
         Background="#222222"
-        ExtendClientAreaToDecorationsHint="True"
-        WindowStartupLocation="CenterScreen">
+        ExtendClientAreaToDecorationsHint="False"
+        WindowStartupLocation="CenterScreen"
+        Focusable="True">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -25,8 +26,24 @@
         <!--     <Setter Property="HorizontalContentAlignment" Value="Center" /> -->
         <!-- </Style> -->
     </Window.Styles>
+    
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#4183f5" /> <!-- 悬浮背景色 -->
+            <Setter Property="Foreground" Value="White" /> <!-- 悬浮文字颜色 -->
+        </Style>
 
-    <Grid RowDefinitions="*,Auto" Margin="10 25 10 10">
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1163f2"/>
+        </Style>
+        
+        <Style Selector="Button[Tag=TitleBarButton]">
+            <Setter Property="Background" Value="LightBlue" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="10 0 10 10" Name="Grid20">
         <!-- 顶部按钮 -->
         <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10"> -->
         <!--     <Button Content="添加文件" Margin="0,0,10,0" /> -->
@@ -35,45 +52,53 @@
         <!-- </StackPanel> -->
 
         <!-- 文件列表 -->
+        <!-- <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"> -->
+        <!--     <ItemsControl ItemsSource="{Binding FileItems}"> -->
+        <!--         <ItemsControl.ItemsPanel> -->
+        <!--             <ItemsPanelTemplate> -->
+        <!--                 <UniformGrid x:Name="GridContentColumn" Rows="0" Columns="4" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Top"/> -->
+        <!--                 ~1~ Columns 设置为 0 或具体值可以动态适配。@1@ -->
+        <!--             </ItemsPanelTemplate> -->
+        <!--         </ItemsControl.ItemsPanel> -->
+        <!--         <ItemsControl.ItemTemplate> -->
+        <!--             <DataTemplate> -->
+        <!--                 <Border HorizontalAlignment="Stretch" Margin="10" Background="#333"> -->
+        <!--                     <Grid> -->
+        <!--                         ~1~ 图像层 @1@ -->
+        <!--                         <Image Source="{Binding ThumbnailBitmap}" Stretch="UniformToFill"/> -->
+        <!--                         ~1~ 覆盖在图像上的文字层 @1@ -->
+        <!--                         <TextBlock Text="{Binding Title}" -->
+        <!--                                    HorizontalAlignment="Stretch" -->
+        <!--                                    VerticalAlignment="Bottom" -->
+        <!--                                    Foreground="White" -->
+        <!--                                    TextAlignment="Center" -->
+        <!--                                    FontSize="14" -->
+        <!--                                    Background="#99000000" -->
+        <!--                                    Padding="5"/> -->
+        <!--                     </Grid> -->
+        <!--                 </Border> -->
+        <!--             </DataTemplate> -->
+        <!--         </ItemsControl.ItemTemplate> -->
+        <!--     </ItemsControl> -->
+        <!-- </ScrollViewer> -->
+        
+        <!-- 内容 -->
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding FileItems}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="180" Height="180" Margin="10" Background="#333">
-                            <Grid>
-                                <!-- 图像层 -->
-                                <Image Source="{Binding ThumbnailBitmap}" Stretch="UniformToFill"/>
-                                <!-- 覆盖在图像上的文字层 -->
-                                <TextBlock Text="{Binding Title}" 
-                                           HorizontalAlignment="Stretch" 
-                                           VerticalAlignment="Bottom" 
-                                           Foreground="White" 
-                                           TextAlignment="Center"
-                                           FontSize="16" 
-                                           Background="#99000000" 
-                                           Padding="5"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <UniformGrid x:Name="GridContentColumn" Rows="0" Columns="4" Margin="10 0 10 10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            </UniformGrid>
         </ScrollViewer>
-
+        
         <!-- 底部按钮 -->
         <Grid Grid.Row="1" RowDefinitions="Auto" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
             <DockPanel LastChildFill="False">
                 <!-- 导出格式选择 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0"
                             DockPanel.Dock="Left">
-                    <TextBlock Text="导出格式:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="是否需要解包:" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <ComboBox Width="100" SelectedIndex="0">
-                        <ComboBoxItem Content="MP3" />
-                        <ComboBoxItem Content="WAV" />
+                        <ComboBoxItem Content="全部" />
+                        <ComboBoxItem Content="是" />
+                        <ComboBoxItem Content="否" />
                         <!-- 添加其他格式 -->
                     </ComboBox>
                 </StackPanel>
@@ -81,7 +106,7 @@
                 <!-- 质量选择 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                             Margin="0,0,20,0" DockPanel.Dock="Left">
-                    <TextBlock Text="导出类型:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="导出类型:" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <ComboBox Width="100" SelectedIndex="0">
                         <ComboBoxItem Content="全部" />
                         <ComboBoxItem Content="视频" />
@@ -91,16 +116,16 @@
                 </StackPanel>
         
                 <!-- 输出目录 -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left">
-                    <TextBlock Text="输出目录:" Foreground="White" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <TextBlock Text="输出目录:" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <TextBox Width="200" Name="OutputDirectory" />
                     <Button Content="..." Width="30" />
                 </StackPanel>
         
                 <!-- 导出选中项 -->
-                <Button Content="导出选中项" Background="#4183f5" Foreground="White"
-                        HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                <Button Content="导出选中项"
+                        HorizontalAlignment="Right" DockPanel.Dock="Right" Name="Button" />
             </DockPanel>
         </Grid>
     </Grid>

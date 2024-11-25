@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>0.2.2</Version>
+        <Copyright>Copyright © NotScuffed 2020</Copyright>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\RePKG.Core\RePKG.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="K4os.Compression.LZ4" Version="1.1.11" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
+        <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="RePKG.Application.csproj.DotSettings" />
+    </ItemGroup>
+</Project>

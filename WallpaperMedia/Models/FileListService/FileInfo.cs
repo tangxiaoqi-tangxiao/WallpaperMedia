@@ -30,4 +30,9 @@ public class FileInfo
     /// 是否需要解包 false不需要 true需要
     /// </summary>
     public bool IsProcess { get; set; }
+
+    /// <summary>
+    /// 被选中状态
+    /// </summary>
+    public bool Selected { get; set; } = false;
 }

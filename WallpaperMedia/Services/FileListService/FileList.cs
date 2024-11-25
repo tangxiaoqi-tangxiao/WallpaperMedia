@@ -14,7 +14,7 @@ public class FileList(RegeditHelp regeditHelp) : IFileList
 {
     public List<FileInfo> FileInfoList()
     {
-        string folderPath = regeditHelp.Read("", "SteamPath")?.ToString().Replace('/','\\');
+        string folderPath = regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
         if (folderPath == null)
         {
             throw new Exception("未找到stema");
@@ -25,6 +25,11 @@ public class FileList(RegeditHelp regeditHelp) : IFileList
         return ParseFile(folderPath);
     }
 
+    //获取系统下载文件夹
+    public string GetDownloadsPath() =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+
+    //解析Wallpaper壁纸文件
     private List<FileInfo> ParseFile(string folderPath)
     {
         if (!Directory.Exists(folderPath))

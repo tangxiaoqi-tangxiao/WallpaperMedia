@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WallpaperMedia", "WallpaperMedia\WallpaperMedia.csproj", "{1F5802BE-BD3E-4D10-94A2-01B34668ADE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RePKG.Core", "RePKG.Core\RePKG.Core.csproj", "{7C8E7681-49C9-4311-8001-26DBAC4A5B97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RePKG.Application", "RePKG.Application\RePKG.Application.csproj", "{1B9FD022-C7E2-48AF-8478-48FD474908AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{1F5802BE-BD3E-4D10-94A2-01B34668ADE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F5802BE-BD3E-4D10-94A2-01B34668ADE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F5802BE-BD3E-4D10-94A2-01B34668ADE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8E7681-49C9-4311-8001-26DBAC4A5B97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8E7681-49C9-4311-8001-26DBAC4A5B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8E7681-49C9-4311-8001-26DBAC4A5B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8E7681-49C9-4311-8001-26DBAC4A5B97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B9FD022-C7E2-48AF-8478-48FD474908AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9FD022-C7E2-48AF-8478-48FD474908AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B9FD022-C7E2-48AF-8478-48FD474908AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9FD022-C7E2-48AF-8478-48FD474908AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
