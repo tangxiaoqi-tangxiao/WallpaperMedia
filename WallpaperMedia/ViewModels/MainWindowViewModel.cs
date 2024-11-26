@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Services;
+using WallpaperMedia.Services.RePKG;
 using WallpaperMedia.ViewModels.MainModels;
 
 namespace WallpaperMedia.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly IFileList _fileList;
+    private readonly IFileListService _fileListService;
+    private readonly IRePKGService _rePKGService;
 
-    public MainWindowViewModel(IFileList fileList)
+    public MainWindowViewModel(IFileListService fileListService, IRePKGService rePKGService)
     {
-        _fileList = fileList;
+        _fileListService = fileListService;
+        _rePKGService = rePKGService;
 
         //初始化
         Initialize();
@@ -27,7 +31,32 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void Initialize()
     {
-        _FileItems = _fileList.FileInfoList();
-        _DownloadsPath = _fileList.GetDownloadsPath();
+        _FileItems = _fileListService.FileInfoList();
+        _DownloadsPath = _fileListService.GetDownloadsPath();
+    }
+
+    public void PerformAction()
+    {
+        List<FileInfo> paths = new();
+        foreach (var item in _FileItems)
+        {
+            if (item.Selected)
+                paths.Add(item);
+        }
+
+        if (paths.Count > 0)
+        {
+            foreach (var item in paths)
+            {
+                if (item.IsProcess)
+                {
+                    _rePKGService.ExtractFile(item.Path);
+                }
+                else
+                {
+                    Console.WriteLine("不需要解包文件路径："+item.Path);
+                }
+            }
+        }
     }
 }

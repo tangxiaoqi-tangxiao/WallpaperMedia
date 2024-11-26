@@ -125,6 +125,7 @@
         
                 <!-- 导出选中项 -->
                 <Button Content="导出选中项"
+                        Command="{Binding PerformAction}"
                         HorizontalAlignment="Right" DockPanel.Dock="Right" Name="Button" />
             </DockPanel>
         </Grid>

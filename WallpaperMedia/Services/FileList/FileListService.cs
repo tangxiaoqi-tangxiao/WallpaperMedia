@@ -10,7 +10,7 @@ using FileInfo = WallpaperMedia.Models.FileListService.FileInfo;
 
 namespace WallpaperMedia.Services.FileListService;
 
-public class FileList(RegeditHelp regeditHelp) : IFileList
+public class FileListService(RegeditHelp regeditHelp) : IFileListService
 {
     public List<FileInfo> FileInfoList()
     {
@@ -41,6 +41,7 @@ public class FileList(RegeditHelp regeditHelp) : IFileList
         string[] directories = Directory.GetDirectories(folderPath, "*.*", SearchOption.TopDirectoryOnly);
 
         const string config = "project.json";
+        const string typeStr = "scene";
         foreach (string directory in directories)
         {
             //判断config文件是否存在
@@ -55,8 +56,8 @@ public class FileList(RegeditHelp regeditHelp) : IFileList
             {
                 FileInfoJson? fileInfoJson =
                     JsonSerializer.Deserialize(jsonStr, FileInfoJsonContext.Default.FileInfoJson);
-                bool isScene = fileInfoJson?.type.ToLower() == "scene";
-                string path = Path.Combine(directory, isScene ? "scene.pkg" : fileInfoJson?.file ?? "");
+                bool isScene = fileInfoJson?.type.ToLower() == typeStr;
+                string path = Path.Combine(directory, isScene ? (typeStr + ".pkg") : fileInfoJson?.file ?? "");
                 if (!File.Exists(path))
                     continue;
                 fileInfos.Add(new FileInfo
@@ -64,7 +65,7 @@ public class FileList(RegeditHelp regeditHelp) : IFileList
                     Title = fileInfoJson?.title ?? "",
                     Path = path,
                     ThumbnailPath = Path.Combine(directory, fileInfoJson?.preview ?? ""),
-                    IsProcess = fileInfoJson?.type == "scene",
+                    IsProcess = fileInfoJson?.type.ToLower() == typeStr,
                     Type = fileInfoJson?.type ?? ""
                 });
             }

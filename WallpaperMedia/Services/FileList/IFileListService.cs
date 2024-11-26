@@ -3,7 +3,7 @@ using WallpaperMedia.Models.FileListService;
 
 namespace WallpaperMedia.Services;
 
-public interface IFileList
+public interface IFileListService
 {
     List<FileInfo> FileInfoList();
     string GetDownloadsPath();

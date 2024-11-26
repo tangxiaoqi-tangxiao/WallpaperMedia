@@ -63,6 +63,7 @@ public partial class MainWindow : Window
         OutputDirectory.Text = _ViewModel._DownloadsPath;
     }
 
+    //监听窗口大小变化
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
         var newWidth = e.NewSize.Width;
@@ -96,6 +97,7 @@ public partial class MainWindow : Window
         }
     }
 
+    //构建内容组件
     private void BuildContentComponent()
     {
         GridContentColumn.Children.Clear();
@@ -156,6 +158,7 @@ public partial class MainWindow : Window
         }
     }
 
+    //监听文本框更改
     private void OnTextChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox textBox)
