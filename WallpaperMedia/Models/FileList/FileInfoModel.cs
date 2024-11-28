@@ -2,7 +2,7 @@
 
 namespace WallpaperMedia.Models.FileListService;
 
-public class FileInfo
+public class FileInfoModel
 {
     /// <summary>
     /// 文件路径

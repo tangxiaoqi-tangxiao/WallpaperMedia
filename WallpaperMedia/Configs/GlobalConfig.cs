@@ -1,9 +1,20 @@
-﻿namespace WallpaperMedia.Configs;
+﻿using System.Text.Json.Serialization;
+using WallpaperMedia.Models.FileListService;
+
+namespace WallpaperMedia.Configs;
 
 public class GlobalConfig
 {
-    //HKEY_CURRENT_USER\Software\Valve\Steam注册表
-    public const string SteamRegedit = @"Software\Valve\Steam";
-    //Wallpaper Engine壁纸路径
-    public const string WallpaperPath = @"steamapps\workshop\content\431960";
+    public static Config config { get; set; }
+}
+
+[JsonSerializable(typeof(Config))]
+public partial class ConfigContext : JsonSerializerContext
+{
+}
+public class Config
+{
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public string OutputDirectory { get; set; }
 }

@@ -30,7 +30,7 @@ public class RePKGService : IRePKGService
     {
         ExtractPkg(new FileInfo(fileInfo));
     }
-    private void ExtractPkg(FileInfo file, bool appendFolderName = false, string defaultProjectName = "")
+    private void ExtractPkg(FileInfo file)
     {
         Console.WriteLine($"\r\n### Extracting package: {file.FullName}");
 
@@ -44,7 +44,6 @@ public class RePKGService : IRePKGService
 
         // Get output directory
         string outputDirectory="C:\\Users\\tangx\\Downloads\\新建文件夹\\";
-        var preview = string.Empty;
 
         // Extract package entries
         foreach (var entry in package.Entries)
@@ -52,34 +51,17 @@ public class RePKGService : IRePKGService
             ExtractEntry(entry, ref outputDirectory);
         }
     }
-    private static void CopyFiles(IEnumerable<FileInfo> files, string outputDirectory)
-    {
-        foreach (var file in files)
-        {
-            var outputPath = Path.Combine(outputDirectory, file.Name);
-
-            if (!false && File.Exists(outputPath))
-                Console.WriteLine($"* Skipping, already exists: {outputPath}");
-            else
-            {
-                File.Copy(file.FullName, outputPath, true);
-                Console.WriteLine($"* Copying: {file.FullName}");
-            }
-        }
-    }
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     private void ExtractEntry(PackageEntry entry, ref string outputDirectory)
     {
         // save raw
-        var filePathWithoutExtension = false
-            ? Path.Combine(outputDirectory, entry.Name)
-            : Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
+        var filePathWithoutExtension = Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
 
         var filePath = filePathWithoutExtension + entry.Extension;
 
         Directory.CreateDirectory(Path.GetDirectoryName(filePathWithoutExtension));
 
-        if (true && File.Exists(filePath))
+        if (File.Exists(filePath))
             Console.WriteLine($"* Skipping, already exists: {filePath}");
         else
         {
@@ -89,7 +71,7 @@ public class RePKGService : IRePKGService
         }
 
         // convert and save
-        if (false || entry.Type != EntryType.Tex)
+        if (entry.Type != EntryType.Tex)
             return;
 
         var tex = LoadTex(entry.Bytes, entry.FullPath);

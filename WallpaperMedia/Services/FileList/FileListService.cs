@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using WallpaperMedia.Configs;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Utils;
-using FileInfo = WallpaperMedia.Models.FileListService.FileInfo;
 
 namespace WallpaperMedia.Services.FileListService;
 
-public class FileListService(RegeditHelp regeditHelp) : IFileListService
+public class FileListService : IFileListService
 {
-    public List<FileInfo> FileInfoList()
+    private readonly RegeditHelp _regeditHelp = new(FileConfig.SteamRegedit);
+
+    public List<FileInfoModel> FileInfoList()
     {
-        string folderPath = regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
+        string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
         if (folderPath == null)
         {
             throw new Exception("未找到stema");
         }
 
-        folderPath = Path.Combine(folderPath, GlobalConfig.WallpaperPath);
+        folderPath = Path.Combine(folderPath, FileConfig.WallpaperPath);
 
         return ParseFile(folderPath);
     }
@@ -29,13 +29,14 @@ public class FileListService(RegeditHelp regeditHelp) : IFileListService
     public string GetDownloadsPath() =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
 
+    //私有方法
     //解析Wallpaper壁纸文件
-    private List<FileInfo> ParseFile(string folderPath)
+    private List<FileInfoModel> ParseFile(string folderPath)
     {
         if (!Directory.Exists(folderPath))
             throw new Exception("未找到Wallpaper Engine下载壁纸");
 
-        List<FileInfo> fileInfos = new List<FileInfo>();
+        List<FileInfoModel> fileInfos = new List<FileInfoModel>();
 
         // 获取所有子目录
         string[] directories = Directory.GetDirectories(folderPath, "*.*", SearchOption.TopDirectoryOnly);
@@ -54,13 +55,13 @@ public class FileListService(RegeditHelp regeditHelp) : IFileListService
                 continue;
             try
             {
-                FileInfoJson? fileInfoJson =
-                    JsonSerializer.Deserialize(jsonStr, FileInfoJsonContext.Default.FileInfoJson);
+                FileInfoJsonModel? fileInfoJson =
+                    JsonSerializer.Deserialize(jsonStr, FileInfoJsonModelContext.Default.FileInfoJsonModel);
                 bool isScene = fileInfoJson?.type.ToLower() == typeStr;
                 string path = Path.Combine(directory, isScene ? (typeStr + ".pkg") : fileInfoJson?.file ?? "");
                 if (!File.Exists(path))
                     continue;
-                fileInfos.Add(new FileInfo
+                fileInfos.Add(new FileInfoModel
                 {
                     Title = fileInfoJson?.title ?? "",
                     Path = path,

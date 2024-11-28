@@ -2,11 +2,11 @@
 
 namespace WallpaperMedia.Models.FileListService;
 
-[JsonSerializable(typeof(FileInfoJson))]
-public partial class FileInfoJsonContext : JsonSerializerContext
+[JsonSerializable(typeof(FileInfoJsonModel))]
+public partial class FileInfoJsonModelContext : JsonSerializerContext
 {
 }
-public class FileInfoJson
+public class FileInfoJsonModel
 {
     public string title { get; set; }
     public string preview { get; set; }

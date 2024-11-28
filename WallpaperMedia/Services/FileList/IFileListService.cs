@@ -5,6 +5,6 @@ namespace WallpaperMedia.Services;
 
 public interface IFileListService
 {
-    List<FileInfo> FileInfoList();
+    List<FileInfoModel> FileInfoList();
     string GetDownloadsPath();
 }

@@ -12,9 +12,9 @@ public static class ServiceCollectionExtensions
 {
     public static void AddCommonServices(this IServiceCollection collection)
     {
-        collection.AddSingleton<MainWindowViewModel>(); //注册窗口
-        collection.AddSingleton<IFileListService, FileListService>();
-        collection.AddScoped<RegeditHelp>((a) => new RegeditHelp(GlobalConfig.SteamRegedit));
-        collection.AddSingleton<IRePKGService, RePKGService>();
+        //注册窗口
+        collection.AddSingleton<MainWindowViewModel>();
+        collection.AddScoped<IFileListService, FileListService>();
+        collection.AddScoped<IRePKGService, RePKGService>();
     }
 }

@@ -32,4 +32,8 @@
       <ProjectReference Include="..\RePKG.Application\RePKG.Application.csproj" />
       <ProjectReference Include="..\RePKG.Core\RePKG.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Utils\ThrottleHelp.cs" />
+    </ItemGroup>
 </Project>

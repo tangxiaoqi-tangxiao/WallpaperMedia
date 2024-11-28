@@ -33,7 +33,7 @@ namespace RePKG.Application.Texture.Helpers
         public uint PackedValue
         {
             get => Rg;
-            set => Rg = (ushort)value;
+            set => Rg = (ushort) value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -87,6 +87,11 @@ namespace RePKG.Application.Texture.Helpers
             G = source.G;
         }
 
+        public void FromAbgr32(Abgr32 source)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void FromL8(L8 source)
         {
             R = source.PackedValue;
@@ -95,9 +100,17 @@ namespace RePKG.Application.Texture.Helpers
 
         public void FromL16(L16 source)
         {
-            var b = DownScaleFrom16BitTo8Bit(source.PackedValue);
-            R = b;
-            G = b;
+            throw new System.NotImplementedException();
+        }
+
+        public void FromLa16(La16 source)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void FromLa32(La32 source)
+        {
+            throw new System.NotImplementedException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -123,7 +136,7 @@ namespace RePKG.Application.Texture.Helpers
 
         public static byte DownScaleFrom16BitTo8Bit(ushort component)
         {
-            return (byte)(component * byte.MaxValue + 32895 >> 16);
+            return (byte) (component * byte.MaxValue + 32895 >> 16);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -157,29 +170,8 @@ namespace RePKG.Application.Texture.Helpers
             vector += Half;
             vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
 
-            R = (byte)vector.X;
-            G = (byte)vector.Y;
-        }
-
-        public void FromAbgr32(Abgr32 source)
-        {
-            R = source.R;
-            G = source.G;
-        }
-
-        public void FromLa16(La16 source)
-        {
-            // La16 是灰度 + alpha，這裡只取灰度的 L 分量
-            var b = DownScaleFrom16BitTo8Bit(source.L);
-            R = b;
-            G = b;
-        }
-
-        public void FromLa32(La32 source)
-        {
-            // La32 是灰度 + alpha，這裡只取灰度的 L 分量
-            R = DownScaleFrom16BitTo8Bit(source.L);
-            G = DownScaleFrom16BitTo8Bit(source.L);
+            R = (byte) vector.X;
+            G = (byte) vector.Y;
         }
     }
 }

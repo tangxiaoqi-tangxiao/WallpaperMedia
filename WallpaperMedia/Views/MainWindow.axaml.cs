@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
-using Avalonia.Animation;
-using Avalonia.Animation.Easings;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using WallpaperMedia.Configs;
-using WallpaperMedia.Services;
 using WallpaperMedia.ViewModels;
-using WallpaperMedia.ViewModels.MainModels;
 
 namespace WallpaperMedia.Views;
 
@@ -24,27 +20,28 @@ public partial class MainWindow : Window
         //初始化
         Initialize();
     }
-
+    
+    private DispatcherTimer _resizeTimer;
     private MainWindowViewModel _ViewModel => DataContext as MainWindowViewModel;
+    private int CurrentWidth = 0;
+    private int CurrentHeight = 0;
 
     public void Initialize()
     {
-        const int minWidth = 840;
-        const int minHeight = 500;
-        //设置窗口大小
-        PixelRect screen = Screens.Primary?.WorkingArea ?? new PixelRect(new PixelSize(minWidth, minHeight));
-        int elasticWidth = screen.Width / 3;
-        int elasticHeight = screen.Height / 3;
+        //初始化窗口
+        InitializeMainWindow();
+        
+        //设置Grid列数量
+        SetGridColumns((int)this.Width);
 
-        int width = elasticWidth > minWidth ? elasticWidth : minWidth;
-        int height = elasticHeight > minHeight ? elasticHeight : minHeight;
-
-        this.Width = width;
-        this.Height = height;
-        this.MinWidth = minWidth;
-        this.MinHeight = minHeight;
-
+        //初始化事件
         InitializeEvent();
+        
+        _resizeTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(500) // 延迟 300 毫秒
+        };
+        _resizeTimer.Tick += OnResizeTimerTick;
     }
 
     //初始化事件
@@ -52,6 +49,7 @@ public partial class MainWindow : Window
     {
         // 监听窗口大小变化事件
         this.SizeChanged += OnSizeChanged;
+        // 加载完成
         this.Loaded += MainWindow_Loaded;
         OutputDirectory.TextChanged += OnTextChanged;
     }
@@ -66,35 +64,11 @@ public partial class MainWindow : Window
     //监听窗口大小变化
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        var newWidth = e.NewSize.Width;
-        // 使用 FindControl 确保获取到控件
-        if (GridContentColumn == null)
-            return;
-        // 动态调整列数
-        if (newWidth <= ScreenSize.Md)
-        {
-            GridContentColumn.Columns = 3;
-        }
-        else if (newWidth <= ScreenSize.Lg)
-        {
-            GridContentColumn.Columns = 4;
-        }
-        else if (newWidth <= ScreenSize.Xl)
-        {
-            GridContentColumn.Columns = 5;
-        }
-        else if (newWidth <= ScreenSize.Xxl)
-        {
-            GridContentColumn.Columns = 6;
-        }
-        else if (newWidth <= ScreenSize.Xxxxl)
-        {
-            GridContentColumn.Columns = 7;
-        }
-        else
-        {
-            GridContentColumn.Columns = 8;
-        }
+        // 每次大小变化时重置定时器
+        _resizeTimer.Stop();
+        CurrentWidth = (int)e.NewSize.Width;
+        CurrentHeight = (int)e.NewSize.Height;
+        _resizeTimer.Start();
     }
 
     //构建内容组件
@@ -165,5 +139,74 @@ public partial class MainWindow : Window
         {
             textBox.Text = _ViewModel._DownloadsPath;
         }
+    }
+
+    private void OnResizeTimerTick(object sender, EventArgs e)
+    {
+        // 处理最后一次触发的事件
+        _resizeTimer.Stop();
+        PixelRect screen = Screens.Primary.WorkingArea;
+        //判断全屏
+        if (screen.Width != CurrentWidth)
+        {
+            GlobalConfig.config.Width = CurrentWidth;
+            GlobalConfig.config.Height = CurrentHeight;
+        }
+        SetGridColumns(CurrentWidth);
+    }
+
+    private void SetGridColumns(int newWidth)
+    {
+        // 使用 FindControl 确保获取到控件
+        if (GridContentColumn == null)
+            return;
+        // 使用一个映射数组来存储屏幕宽度对应的列数
+        var widthToColumns = new (int maxWidth, int columns)[]
+        {
+            (ScreenSize.Md, 3),
+            (ScreenSize.Lg, 4),
+            (ScreenSize.Xl, 5),
+            (ScreenSize.Xxl, 6),
+            (ScreenSize.Xxxxl, 7),
+        };
+        // 使用 LINQ 查找匹配的列数
+        var matchingColumn = widthToColumns.FirstOrDefault(mapping => newWidth <= mapping.maxWidth);
+        // 如果找到了匹配的列数，则设置，否则默认设置为 8
+        GridContentColumn.Columns = matchingColumn.columns != 0 ? matchingColumn.columns : 8;
+    }
+
+    private void InitializeMainWindow()
+    {
+        const int minWidth = 840;
+        const int minHeight = 500;
+
+        //设置窗口大小
+        PixelRect screen = Screens.Primary?.WorkingArea ?? new PixelRect(new PixelSize(minWidth, minHeight));
+        int elasticWidth = screen.Width / 3;
+        int elasticHeight = screen.Height / 3;
+
+        int width = elasticWidth > minWidth ? elasticWidth : minWidth;
+        int height = elasticHeight > minHeight ? elasticHeight : minHeight;
+
+        if (GlobalConfig.config.Width > 0 && GlobalConfig.config.Width >= minWidth)
+        {
+            this.Width = GlobalConfig.config.Width;
+        }
+        else
+        {
+            this.Width = width;
+        }
+
+        if (GlobalConfig.config.Height > 0 && GlobalConfig.config.Height >= minHeight)
+        {
+            this.Height = GlobalConfig.config.Height;
+        }
+        else
+        {
+            this.Height = height;
+        }
+
+        this.MinWidth = minWidth;
+        this.MinHeight = minHeight;
     }
 }

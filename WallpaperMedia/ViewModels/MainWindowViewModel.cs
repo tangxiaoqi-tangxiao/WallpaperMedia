@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using WallpaperMedia.Configs;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Services;
 using WallpaperMedia.Services.RePKG;
-using WallpaperMedia.ViewModels.MainModels;
+using WallpaperMedia.Utils;
 
 namespace WallpaperMedia.ViewModels;
 
@@ -27,17 +28,17 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// 获取<see cref="ToDoItem"/>的集合，该集合允许添加和删除项目
     /// </summary>
-    public List<FileInfo> _FileItems { get; set; } = new();
+    public List<FileInfoModel> _FileItems { get; set; } = new();
 
     public void Initialize()
     {
         _FileItems = _fileListService.FileInfoList();
-        _DownloadsPath = _fileListService.GetDownloadsPath();
+        SetOutputDirectory();
     }
 
     public void PerformAction()
     {
-        List<FileInfo> paths = new();
+        List<FileInfoModel> paths = new();
         foreach (var item in _FileItems)
         {
             if (item.Selected)
@@ -54,9 +55,23 @@ public partial class MainWindowViewModel : ViewModelBase
                 }
                 else
                 {
-                    Console.WriteLine("不需要解包文件路径："+item.Path);
+                    FileHelp.CopyFile(item.Path, "C:\\Users\\tangx\\Downloads\\新建文件夹");
                 }
             }
+        }
+    }
+
+    //私有方法
+    private void SetOutputDirectory()
+    {
+        if (string.IsNullOrWhiteSpace(GlobalConfig.config.OutputDirectory))
+        {
+            _DownloadsPath = _fileListService.GetDownloadsPath();
+            GlobalConfig.config.OutputDirectory = _DownloadsPath;
+        }
+        else
+        {
+            _DownloadsPath = GlobalConfig.config.OutputDirectory;
         }
     }
 }
