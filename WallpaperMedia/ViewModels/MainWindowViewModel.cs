@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using WallpaperMedia.Configs;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Services;
@@ -14,6 +15,19 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IFileListService _fileListService;
     private readonly IRePKGService _rePKGService;
 
+    private bool IsButtonEnabled = true;
+
+    public bool _IsButtonEnabled
+    {
+        get => IsButtonEnabled;
+        set
+        {
+            IsButtonEnabled = value;
+            //更新UI
+            OnPropertyChanged();
+        }
+    }
+
     public MainWindowViewModel(IFileListService fileListService, IRePKGService rePKGService)
     {
         _fileListService = fileListService;
@@ -23,8 +37,6 @@ public partial class MainWindowViewModel : ViewModelBase
         Initialize();
     }
 
-    public string _DownloadsPath { get; set; }
-
     /// <summary>
     /// 获取<see cref="ToDoItem"/>的集合，该集合允许添加和删除项目
     /// </summary>
@@ -33,31 +45,50 @@ public partial class MainWindowViewModel : ViewModelBase
     public void Initialize()
     {
         _FileItems = _fileListService.FileInfoList();
+        //设置输出路径
         SetOutputDirectory();
     }
 
-    public void PerformAction()
+    //导出命令
+    public async void ExportOriginalFile()
     {
-        List<FileInfoModel> paths = new();
-        foreach (var item in _FileItems)
+        try
         {
-            if (item.Selected)
-                paths.Add(item);
-        }
-
-        if (paths.Count > 0)
-        {
-            foreach (var item in paths)
+            _IsButtonEnabled = false;
+            List<FileInfoModel> paths = new();
+            foreach (var item in _FileItems)
             {
-                if (item.IsProcess)
+                if (item.Selected)
+                    paths.Add(item);
+            }
+
+            if (paths.Count > 0)
+            {
+                foreach (var item in paths)
                 {
-                    _rePKGService.ExtractFile(item.Path);
-                }
-                else
-                {
-                    FileHelp.CopyFile(item.Path, "C:\\Users\\tangx\\Downloads\\新建文件夹");
+                    string fileName = FileHelp.CleanFileName(item.Title);
+                    if (fileName.Length > 20)
+                        fileName = fileName.Substring(0, 20);
+                    if (item.IsProcess)
+                    {
+                        await _rePKGService.ExtractFile(item.Path, fileName);
+                    }
+                    else
+                    {
+                        string output = Path.Combine(GlobalConfig.config.OutputDirectory, fileName);
+                        Directory.CreateDirectory(output);
+                        FileHelp.CopyFile(item.Path, output);
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        finally
+        {
+            _IsButtonEnabled = true;
         }
     }
 
@@ -66,12 +97,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(GlobalConfig.config.OutputDirectory))
         {
-            _DownloadsPath = _fileListService.GetDownloadsPath();
-            GlobalConfig.config.OutputDirectory = _DownloadsPath;
-        }
-        else
-        {
-            _DownloadsPath = GlobalConfig.config.OutputDirectory;
+            GlobalConfig.config.OutputDirectory = _fileListService.GetDownloadsPath();
         }
     }
 }

@@ -4,12 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using RePKG.Application.Package;
 using RePKG.Application.Texture;
 using RePKG.Core.Package;
 using RePKG.Core.Package.Enums;
 using RePKG.Core.Package.Interfaces;
 using RePKG.Core.Texture;
+using WallpaperMedia.Configs;
 
 namespace WallpaperMedia.Services.RePKG;
 
@@ -19,6 +21,7 @@ public class RePKGService : IRePKGService
     private readonly ITexReader _texReader;
     private readonly TexToImageConverter _texToImageConverter;
     private readonly ITexJsonInfoGenerator _texJsonInfoGenerator;
+
     public RePKGService()
     {
         _packageReader = new PackageReader();
@@ -26,11 +29,19 @@ public class RePKGService : IRePKGService
         _texToImageConverter = new TexToImageConverter();
         _texJsonInfoGenerator = new TexJsonInfoGenerator();
     }
-    public void ExtractFile(string fileInfo)
+
+    public Task ExtractFile(string filePath, string fileName)
     {
-        ExtractPkg(new FileInfo(fileInfo));
+        return Task.Run(() =>
+        {
+            if (!File.Exists(filePath))
+                return;
+
+            ExtractPkg(new FileInfo(filePath), fileName);
+        });
     }
-    private void ExtractPkg(FileInfo file)
+
+    private void ExtractPkg(FileInfo file, string fileName)
     {
         Console.WriteLine($"\r\n### Extracting package: {file.FullName}");
 
@@ -42,33 +53,31 @@ public class RePKGService : IRePKGService
             package = _packageReader.ReadFrom(reader);
         }
 
-        // Get output directory
-        string outputDirectory="C:\\Users\\tangx\\Downloads\\新建文件夹\\";
-
         // Extract package entries
         foreach (var entry in package.Entries)
         {
-            ExtractEntry(entry, ref outputDirectory);
+            ExtractEntry(entry, Path.Combine(GlobalConfig.config.OutputDirectory, fileName));
         }
     }
+
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-    private void ExtractEntry(PackageEntry entry, ref string outputDirectory)
+    private void ExtractEntry(PackageEntry entry, string outputDirectory)
     {
         // save raw
-        var filePathWithoutExtension = Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
-
-        var filePath = filePathWithoutExtension + entry.Extension;
-
-        Directory.CreateDirectory(Path.GetDirectoryName(filePathWithoutExtension));
-
-        if (File.Exists(filePath))
-            Console.WriteLine($"* Skipping, already exists: {filePath}");
-        else
-        {
-            Console.WriteLine($"* Extracting: {entry.FullPath}");
-
-            File.WriteAllBytes(filePath, entry.Bytes);
-        }
+        // var filePathWithoutExtension = Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
+        //
+        // var filePath = filePathWithoutExtension + entry.Extension;
+        //
+        // Directory.CreateDirectory(Path.GetDirectoryName(filePathWithoutExtension));
+        //
+        // if (File.Exists(filePath))
+        //     Console.WriteLine($"* Skipping, already exists: {filePath}");
+        // else
+        // {
+        //     Console.WriteLine($"* Extracting: {entry.FullPath}");
+        //
+        //     File.WriteAllBytes(filePath, entry.Bytes);
+        // }
 
         // convert and save
         if (entry.Type != EntryType.Tex)
@@ -81,9 +90,14 @@ public class RePKGService : IRePKGService
 
         try
         {
+            string filePathWithoutExtension = entry.DirectoryPath == "materials"
+                ? Path.Combine(outputDirectory, entry.Name)
+                : Path.Combine(outputDirectory, entry.DirectoryPath, entry.Name);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(filePathWithoutExtension));
             ConvertToImageAndSave(tex, filePathWithoutExtension, false);
-            var jsonInfo = _texJsonInfoGenerator.GenerateInfo(tex);
-            File.WriteAllText($"{filePathWithoutExtension}.tex-json", jsonInfo);
+            // var jsonInfo = _texJsonInfoGenerator.GenerateInfo(tex);
+            // File.WriteAllText($"{filePathWithoutExtension}.tex-json", jsonInfo);
         }
         catch (Exception e)
         {
@@ -91,6 +105,7 @@ public class RePKGService : IRePKGService
             Console.WriteLine(e);
         }
     }
+
     private ITex LoadTex(byte[] bytes, string name)
     {
         Console.WriteLine("* Reading: {0}", name);
@@ -110,6 +125,7 @@ public class RePKGService : IRePKGService
 
         return null;
     }
+
     private void ConvertToImageAndSave(ITex tex, string path, bool overwrite)
     {
         var format = _texToImageConverter.GetConvertedFormat(tex);
@@ -117,7 +133,7 @@ public class RePKGService : IRePKGService
 
         if (!overwrite && File.Exists(outputPath))
             return;
-            
+
         var resultImage = _texToImageConverter.ConvertToImage(tex);
 
         File.WriteAllBytes(outputPath, resultImage.Bytes);

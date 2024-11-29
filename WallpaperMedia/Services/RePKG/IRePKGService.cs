@@ -1,6 +1,8 @@
-﻿namespace WallpaperMedia.Services.RePKG;
+﻿using System.Threading.Tasks;
+
+namespace WallpaperMedia.Services.RePKG;
 
 public interface IRePKGService
 {
-    void ExtractFile(string fileInfo);
+    Task ExtractFile(string filePath,string fileName);
 }

@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using WallpaperMedia.Configs;
+using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.ViewModels;
 
 namespace WallpaperMedia.Views;
@@ -20,23 +23,24 @@ public partial class MainWindow : Window
         //初始化
         Initialize();
     }
-    
-    private DispatcherTimer _resizeTimer;
+
     private MainWindowViewModel _ViewModel => DataContext as MainWindowViewModel;
-    private int CurrentWidth = 0;
-    private int CurrentHeight = 0;
+    private bool _isLoading;
+    private DispatcherTimer _resizeTimer;
+    private int _CurrentWidth = 0;
+    private int _CurrentHeight = 0;
 
     public void Initialize()
     {
         //初始化窗口
         InitializeMainWindow();
-        
+
         //设置Grid列数量
         SetGridColumns((int)this.Width);
 
         //初始化事件
         InitializeEvent();
-        
+
         _resizeTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(500) // 延迟 300 毫秒
@@ -54,11 +58,13 @@ public partial class MainWindow : Window
         OutputDirectory.TextChanged += OnTextChanged;
     }
 
+    //窗口加载完成执行事件
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         // 在这里处理ViewModel初始化完成后的逻辑
-        BuildContentComponent();
-        OutputDirectory.Text = _ViewModel._DownloadsPath;
+        OutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+        _isLoading = true;
+        BuildContentComponent(_ViewModel._FileItems);
     }
 
     //监听窗口大小变化
@@ -66,16 +72,16 @@ public partial class MainWindow : Window
     {
         // 每次大小变化时重置定时器
         _resizeTimer.Stop();
-        CurrentWidth = (int)e.NewSize.Width;
-        CurrentHeight = (int)e.NewSize.Height;
+        _CurrentWidth = (int)e.NewSize.Width;
+        _CurrentHeight = (int)e.NewSize.Height;
         _resizeTimer.Start();
     }
 
     //构建内容组件
-    private void BuildContentComponent()
+    private void BuildContentComponent(List<FileInfoModel> fileList)
     {
         GridContentColumn.Children.Clear();
-        foreach (var viewModelFileItem in _ViewModel._FileItems)
+        foreach (var viewModelFileItem in fileList)
         {
             Border border = new();
             Image image = new();
@@ -137,24 +143,27 @@ public partial class MainWindow : Window
     {
         if (sender is TextBox textBox)
         {
-            textBox.Text = _ViewModel._DownloadsPath;
+            textBox.Text = GlobalConfig.config.OutputDirectory;
         }
     }
 
+    //延迟触发窗口变化事件
     private void OnResizeTimerTick(object sender, EventArgs e)
     {
         // 处理最后一次触发的事件
         _resizeTimer.Stop();
         PixelRect screen = Screens.Primary.WorkingArea;
         //判断全屏
-        if (screen.Width != CurrentWidth)
+        if (screen.Width != _CurrentWidth)
         {
-            GlobalConfig.config.Width = CurrentWidth;
-            GlobalConfig.config.Height = CurrentHeight;
+            GlobalConfig.config.Width = _CurrentWidth;
+            GlobalConfig.config.Height = _CurrentHeight;
         }
-        SetGridColumns(CurrentWidth);
+
+        SetGridColumns(_CurrentWidth);
     }
 
+    //设置内容元素列数量
     private void SetGridColumns(int newWidth)
     {
         // 使用 FindControl 确保获取到控件
@@ -175,6 +184,7 @@ public partial class MainWindow : Window
         GridContentColumn.Columns = matchingColumn.columns != 0 ? matchingColumn.columns : 8;
     }
 
+    //初始化窗口
     private void InitializeMainWindow()
     {
         const int minWidth = 840;
@@ -208,5 +218,51 @@ public partial class MainWindow : Window
 
         this.MinWidth = minWidth;
         this.MinHeight = minHeight;
+    }
+
+    //打开文件选择器
+    private void FileSelector(object? sender, RoutedEventArgs e)
+    {
+        var downloads = StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Downloads).Result;
+
+        var folder = StorageProvider.OpenFolderPickerAsync(new()
+        {
+            Title = "导出目录",
+            SuggestedStartLocation = downloads
+        }).Result;
+        if (folder.Count > 0)
+        {
+            GlobalConfig.config.OutputDirectory = folder[0].Path.LocalPath;
+            OutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+        }
+    }
+
+    // 处理 ComboBox 的选择事件
+    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var comboBox = sender as ComboBox;
+        var selectedItem = comboBox.SelectedItem as ComboBoxItem;
+
+        // 显示选择的项
+        if (selectedItem != null && _isLoading)
+        {
+            List<FileInfoModel> fileList = null;
+            var selectedIndex = (string)selectedItem.Tag;
+            if (selectedIndex == "0")
+            {
+                fileList = _ViewModel._FileItems;
+            }
+            else if (selectedIndex == "1")
+            {
+                fileList = _ViewModel._FileItems.Where(e => e.IsProcess).ToList();
+            }
+            else
+            {
+                fileList = _ViewModel._FileItems.Where(e => !e.IsProcess).ToList();
+            }
+
+            //重新渲染内容
+            BuildContentComponent(fileList);
+        }
     }
 }

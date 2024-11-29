@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.AccessControl;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WallpaperMedia.Configs;
 
@@ -37,6 +38,18 @@ public class FileHelp
         }
 
         return false;
+    }
+    
+    //处理文件夹名称非法字符
+    public static string CleanFileName(string input)
+    {
+        // 定义 Windows 文件夹名称中的非法字符
+        string invalidChars = @"[<>:""/\\|?*]";
+
+        // 去除非法字符
+        string cleanName = Regex.Replace(input, invalidChars, "");
+
+        return cleanName;
     }
 
     //读取配置
