@@ -53,13 +53,13 @@ public class FileHelp
     }
 
     //读取配置
-    public static async Task ReadConfig()
+    public static void ReadConfig()
     {
         try
         {
-            await using var fs = File.OpenRead(FileConfig.ConfigPath);
+            using var fs = File.OpenRead(FileConfig.ConfigPath);
             if (fs.Length != 0)
-                GlobalConfig.config = await JsonSerializer.DeserializeAsync(fs, ConfigContext.Default.Config);
+                GlobalConfig.config = JsonSerializer.DeserializeAsync(fs, ConfigContext.Default.Config).Result;
             else
             {
                 GlobalConfig.config = new Config();
@@ -72,12 +72,12 @@ public class FileHelp
     }
 
     //写入配置
-    public static async Task WriteConfig()
+    public static void WriteConfig()
     {
         if (GlobalConfig.config != null)
         {
-            await using var fs = File.Create(FileConfig.ConfigPath);
-            await JsonSerializer.SerializeAsync(fs, GlobalConfig.config, ConfigContext.Default.Config);
+            using var fs = File.Create(FileConfig.ConfigPath);
+            JsonSerializer.SerializeAsync(fs, GlobalConfig.config, ConfigContext.Default.Config).Wait();
         }
     }
 }

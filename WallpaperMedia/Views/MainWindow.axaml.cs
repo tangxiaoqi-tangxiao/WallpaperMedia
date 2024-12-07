@@ -43,7 +43,7 @@ public partial class MainWindow : Window
 
         _resizeTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(500) // 延迟 300 毫秒
+            Interval = TimeSpan.FromMilliseconds(500) // 延迟 500 毫秒
         };
         _resizeTimer.Tick += OnResizeTimerTick;
     }
@@ -263,6 +263,22 @@ public partial class MainWindow : Window
 
             //重新渲染内容
             BuildContentComponent(fileList);
+        }
+    }
+
+    //搜索
+    private void Search(object? sender, RoutedEventArgs routedEventArgs)
+    {
+        if (!string.IsNullOrWhiteSpace(Value.Text) && (string)SearchButton.Content! == "搜索")
+        {
+            SearchButton.Content = "清除";
+            BuildContentComponent(_ViewModel._FileItems.Where(e => e.Title != null && e.Title.Contains(Value.Text)).ToList());
+        }
+        else
+        {
+            SearchButton.Content = "搜索";
+            Value.Text = "";
+            BuildContentComponent(_ViewModel._FileItems);
         }
     }
 }

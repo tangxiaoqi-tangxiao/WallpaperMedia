@@ -37,9 +37,8 @@
             <Setter Property="Background" Value="#1163f2" />
         </Style>
 
-        <Style Selector="Button[Tag=TitleBarButton]">
+        <Style Selector="TextBox:focus:pointerover">
             <Setter Property="Background" Value="LightBlue" />
-            <Setter Property="Foreground" Value="White" />
         </Style>
     </Window.Styles>
 
@@ -88,8 +87,18 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left"
                             >
-                    <TextBox Width="400" Margin="20 0 0 0 " />
-                    <Button Content="搜索" Margin="5 0 0 0 " HorizontalAlignment="Stretch" />
+                    <TextBox Width="400" Margin="20 0 0 0 " Name="Value" />
+                    <Button Content="搜索" Margin="5 0 0 0 " HorizontalAlignment="Stretch" Click="Search" Name="SearchButton" />
+                </StackPanel>
+                <!-- 导出格式选择 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0"
+                            DockPanel.Dock="Right">
+                    <ComboBox Width="150" SelectedIndex="0" SelectionChanged="OnSelectionChanged">
+                        <ComboBoxItem Content="全部" Tag="0" />
+                        <ComboBoxItem Content="需要解包" Tag="1" />
+                        <ComboBoxItem Content="不需要解包" Tag="2" />
+                        <!-- 添加其他格式 -->
+                    </ComboBox>
                 </StackPanel>
             </DockPanel>
         </Grid>
@@ -104,33 +113,9 @@
         <!-- 底部按钮 -->
         <Grid Grid.Row="2" RowDefinitions="Auto" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
             <DockPanel LastChildFill="False">
-                <!-- 导出格式选择 -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0"
-                            DockPanel.Dock="Left">
-                    <TextBlock Text="是否需要解包:" VerticalAlignment="Center" Margin="0 0 5 0" />
-                    <ComboBox Width="100" SelectedIndex="0" SelectionChanged="OnSelectionChanged">
-                        <ComboBoxItem Content="全部" Tag="0" />
-                        <ComboBoxItem Content="是" Tag="1" />
-                        <ComboBoxItem Content="否" Tag="2" />
-                        <!-- 添加其他格式 -->
-                    </ComboBox>
-                </StackPanel>
-
-                <!-- 质量选择 -->
-                <!-- <StackPanel Orientation="Horizontal" VerticalAlignment="Center" -->
-                <!--             Margin="0,0,20,0" DockPanel.Dock="Left"> -->
-                <!--     <TextBlock Text="导出类型:" VerticalAlignment="Center" Margin="0 0 5 0" /> -->
-                <!--     <ComboBox Width="100" SelectedIndex="0"> -->
-                <!--         <ComboBoxItem Content="全部" /> -->
-                <!--         <ComboBoxItem Content="视频" /> -->
-                <!--         <ComboBoxItem Content="图片" /> -->
-                <!--         ~1~ 添加其他质量选项 @1@ -->
-                <!--     </ComboBox> -->
-                <!-- </StackPanel> -->
-
                 <!-- 输出目录 -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left">
+                            VerticalAlignment="Center" Margin="20,0,0,0" DockPanel.Dock="Left">
                     <TextBlock Text="输出目录:" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <TextBox Width="400" Name="OutputDirectory" />
                     <Button Content="..." Width="30" Click="FileSelector" />

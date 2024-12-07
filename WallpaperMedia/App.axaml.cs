@@ -18,11 +18,10 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override async void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
     {
         //读取配置文件
-        await FileHelp.ReadConfig();
-        
+        FileHelp.ReadConfig();
         // 注册应用程序运行所需的所有服务
         var collection = new ServiceCollection();
         collection.AddCommonServices();
@@ -55,13 +54,13 @@ public partial class App : Application
     }
     
     private bool _canClose; //此标志用于检查是否允许窗口关闭
-    private async void DesktopOnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
+    private void DesktopOnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
     {
         e.Cancel = !_canClose; //第一次取消关闭事件
 
         if (!_canClose)
-        {
-            await FileHelp.WriteConfig();
+        { 
+            FileHelp.WriteConfig();
             //将_canClose设置为true并再次关闭此窗口
             _canClose = true;
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
