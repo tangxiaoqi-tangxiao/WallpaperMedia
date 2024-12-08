@@ -15,18 +15,14 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IFileListService _fileListService;
     private readonly IRePKGService _rePKGService;
-    
+
     public MainWindowViewModel(IFileListService fileListService, IRePKGService rePKGService)
     {
         _fileListService = fileListService;
         _rePKGService = rePKGService;
-
-        //初始化
-        Initialize();
     }
-    
+
     private bool _widgetIsButtonEnabled = true;
-    private bool _widgetSteamSelectorIsVisible = true;
     public bool WidgetIsButtonEnabled
     {
         get => _widgetIsButtonEnabled;
@@ -38,16 +34,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public bool WidgetSteamSelectorIsVisible
-    {
-        get => _widgetSteamSelectorIsVisible;
-        set
-        {
-            _widgetSteamSelectorIsVisible = value;
-            OnPropertyChanged();
-        }
-    }
-
     /// <summary>
     /// 获取<see cref="ToDoItem"/>的集合，该集合允许添加和删除项目
     /// </summary>
@@ -55,22 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void Initialize()
     {
-        try
-        {
-            _FileItems = _fileListService.FileInfoList();
-        }
-        catch (WallpaperPathError e)
-        {
-            if (e.ErrorType == WallpaperPathErrorEnum.Steam)
-            {
-                ShowSteamSelector(true);
-            }
-            else
-            {
-                ShowSteamSelector(false);
-            }
-        }
-        
+        _FileItems = _fileListService.FileInfoList();
         //设置输出路径
         SetOutputDirectory();
     }
@@ -125,10 +96,5 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             GlobalConfig.config.OutputDirectory = _fileListService.GetDownloadsPath();
         }
-    }
-
-    void ShowSteamSelector(bool isShow)
-    {
-        WidgetSteamSelectorIsVisible = true;
     }
 }

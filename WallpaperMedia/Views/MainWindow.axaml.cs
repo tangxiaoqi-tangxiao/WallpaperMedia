@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using WallpaperMedia.Configs;
+using WallpaperMedia.CustomException;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.ViewModels;
 
@@ -61,12 +63,30 @@ public partial class MainWindow : Window
     //窗口加载完成执行事件
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        // 在这里处理ViewModel初始化完成后的逻辑
-        WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
-        _isLoading = true;
-        if (_ViewModel._FileItems.Count == 0)
-            ShowHint(true);
-        BuildContentComponent(_ViewModel._FileItems);
+        try
+        {
+            //初始化ViewModel
+            _ViewModel.Initialize();
+
+            // 加载输出文件路径
+            WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+            
+            _isLoading = true;
+            
+            //没有数据展示提示词
+            if (_ViewModel._FileItems.Count == 0)
+                ShowHint(true);
+            
+            //加载数据
+            BuildContentComponent(_ViewModel._FileItems);
+        }
+        catch (WallpaperPathError mError)
+        {
+            if (mError.ErrorType == WallpaperPathErrorEnum.Steam)
+            {
+                ShowSteamSelector(true);
+            }
+        }
     }
 
     //监听窗口大小变化
@@ -223,7 +243,7 @@ public partial class MainWindow : Window
     }
 
     //打开文件选择器
-    private void FileSelector(object? sender, RoutedEventArgs e)
+    private void FolderSelector(object? sender, RoutedEventArgs e)
     {
         var downloads = StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Downloads).Result;
 
@@ -236,6 +256,29 @@ public partial class MainWindow : Window
         {
             GlobalConfig.config.OutputDirectory = folder[0].Path.LocalPath;
             WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+        }
+    }
+    
+    //打开Steam文件选择器
+    private void SteamFolderSelector(object? sender, RoutedEventArgs e)
+    {
+        var folder = StorageProvider.OpenFolderPickerAsync(new()
+        {
+            Title = "Steam目录"
+        }).Result;
+        
+        if (folder.Count > 0)
+        {
+            string folderPath = Path.Combine(folder[0].Path.LocalPath,"steam.exe");
+            //判断该文件夹是否存在Steam
+            if (File.Exists(folderPath))
+            {
+                GlobalConfig.config.SteamPath = folderPath;
+            }
+            else
+            {
+                Console.WriteLine("文件不存在。");
+            }
         }
     }
 
@@ -291,12 +334,42 @@ public partial class MainWindow : Window
     }
 
     //显示提示
-    void ShowHint(bool isShow)
+    private void ShowHint(bool isShow)
     {
         WidgetGridContentColumn.IsVisible = !isShow;
         WidgetHint.IsVisible = isShow;
+
+        WidgetStackPanelContent.Orientation = !isShow ? Orientation.Vertical : Orientation.Horizontal;
+        WidgetStackPanelContent.HorizontalAlignment = HorizontalAlignment.Center;
+    }
+
+    //显示
+    private void ShowSteamSelector(bool isShow)
+    {
+        //显示控件
+        WidgetSteamSelector.IsVisible = isShow;
+        if (isShow)
+        {
+            IsEnabledComponent(false);
+        }
+        else
+        {
+            IsEnabledComponent(true);
+        }
         
         WidgetStackPanelContent.Orientation = !isShow ? Orientation.Vertical : Orientation.Horizontal;
-        WidgetStackPanelContent.HorizontalAlignment=HorizontalAlignment.Center;
+        WidgetStackPanelContent.HorizontalAlignment = HorizontalAlignment.Center;
+
+        //隐藏控件
+        WidgetGridContentColumn.IsVisible = !isShow;
+        WidgetHint.IsVisible = !isShow;
+    }
+    
+    //启用或禁用组件
+    private void IsEnabledComponent(bool isEnabled)
+    {
+        WidgetExportButton.IsEnabled = isEnabled;
+        WidgetSearchButton.IsEnabled = isEnabled;
+        ComboBox.IsEnabled = isEnabled;
     }
 }

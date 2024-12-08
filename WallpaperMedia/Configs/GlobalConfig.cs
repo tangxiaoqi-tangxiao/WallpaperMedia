@@ -16,5 +16,6 @@ public class Config
 {
     public int Width { get; set; }
     public int Height { get; set; }
+    public string SteamPath { get; set; }
     public string OutputDirectory { get; set; }
 }

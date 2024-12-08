@@ -15,15 +15,19 @@ public class FileListService : IFileListService
 
     public List<FileInfoModel> FileInfoList()
     {
-        string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
-        if (folderPath == null)
+        if (string.IsNullOrWhiteSpace(GlobalConfig.config.SteamPath))
         {
-            throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
+            string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
+            if (folderPath == null)
+            {
+                throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
+            }
+            GlobalConfig.config.SteamPath = folderPath;
         }
 
-        folderPath = Path.Combine(folderPath, FileConfig.WallpaperPath);
+        string wallpaperPath = Path.Combine(GlobalConfig.config.SteamPath, FileConfig.WallpaperPath);
 
-        return ParseFile(folderPath);
+        return ParseFile(wallpaperPath);
     }
 
     //获取系统下载文件夹
