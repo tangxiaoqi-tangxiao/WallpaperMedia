@@ -55,15 +55,17 @@ public partial class MainWindow : Window
         this.SizeChanged += OnSizeChanged;
         // 加载完成
         this.Loaded += MainWindow_Loaded;
-        OutputDirectory.TextChanged += OnTextChanged;
+        WidgetOutputDirectory.TextChanged += OnTextChanged;
     }
 
     //窗口加载完成执行事件
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         // 在这里处理ViewModel初始化完成后的逻辑
-        OutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+        WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
         _isLoading = true;
+        if (_ViewModel._FileItems.Count == 0)
+            ShowHint(true);
         BuildContentComponent(_ViewModel._FileItems);
     }
 
@@ -80,7 +82,7 @@ public partial class MainWindow : Window
     //构建内容组件
     private void BuildContentComponent(List<FileInfoModel> fileList)
     {
-        GridContentColumn.Children.Clear();
+        WidgetGridContentColumn.Children.Clear();
         foreach (var viewModelFileItem in fileList)
         {
             Border border = new();
@@ -134,7 +136,7 @@ public partial class MainWindow : Window
             textBlock.Padding = new Thickness(5);
             grid.Children.Add(textBlock);
 
-            GridContentColumn.Children.Add(border);
+            WidgetGridContentColumn.Children.Add(border);
         }
     }
 
@@ -167,7 +169,7 @@ public partial class MainWindow : Window
     private void SetGridColumns(int newWidth)
     {
         // 使用 FindControl 确保获取到控件
-        if (GridContentColumn == null)
+        if (WidgetGridContentColumn == null)
             return;
         // 使用一个映射数组来存储屏幕宽度对应的列数
         var widthToColumns = new (int maxWidth, int columns)[]
@@ -181,7 +183,7 @@ public partial class MainWindow : Window
         // 使用 LINQ 查找匹配的列数
         var matchingColumn = widthToColumns.FirstOrDefault(mapping => newWidth <= mapping.maxWidth);
         // 如果找到了匹配的列数，则设置，否则默认设置为 8
-        GridContentColumn.Columns = matchingColumn.columns != 0 ? matchingColumn.columns : 8;
+        WidgetGridContentColumn.Columns = matchingColumn.columns != 0 ? matchingColumn.columns : 8;
     }
 
     //初始化窗口
@@ -233,7 +235,7 @@ public partial class MainWindow : Window
         if (folder.Count > 0)
         {
             GlobalConfig.config.OutputDirectory = folder[0].Path.LocalPath;
-            OutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+            WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
         }
     }
 
@@ -269,16 +271,32 @@ public partial class MainWindow : Window
     //搜索
     private void Search(object? sender, RoutedEventArgs routedEventArgs)
     {
-        if (!string.IsNullOrWhiteSpace(Value.Text) && (string)SearchButton.Content! == "搜索")
+        if (!string.IsNullOrWhiteSpace(WidgetValue.Text) && (string)WidgetSearchButton.Content! == "搜索")
         {
-            SearchButton.Content = "清除";
-            BuildContentComponent(_ViewModel._FileItems.Where(e => e.Title != null && e.Title.Contains(Value.Text)).ToList());
+            WidgetSearchButton.Content = "清除";
+            var list = _ViewModel._FileItems.Where(e => e.Title != null && e.Title.Contains(WidgetValue.Text)).ToList();
+            if (list.Count == 0)
+                ShowHint(true);
+            else
+                ShowHint(false);
+            BuildContentComponent(list);
         }
         else
         {
-            SearchButton.Content = "搜索";
-            Value.Text = "";
+            WidgetSearchButton.Content = "搜索";
+            WidgetValue.Text = "";
+            ShowHint(false);
             BuildContentComponent(_ViewModel._FileItems);
         }
+    }
+
+    //显示提示
+    void ShowHint(bool isShow)
+    {
+        WidgetGridContentColumn.IsVisible = !isShow;
+        WidgetHint.IsVisible = isShow;
+        
+        WidgetStackPanelContent.Orientation = !isShow ? Orientation.Vertical : Orientation.Horizontal;
+        WidgetStackPanelContent.HorizontalAlignment=HorizontalAlignment.Center;
     }
 }

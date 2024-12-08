@@ -85,10 +85,10 @@
         <Grid Grid.Row="0" RowDefinitions="Auto" ColumnDefinitions="*,Auto" Margin="0,5,0,5">
             <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left"
-                            >
-                    <TextBox Width="400" Margin="20 0 0 0 " Name="Value" />
-                    <Button Content="搜索" Margin="5 0 0 0 " HorizontalAlignment="Stretch" Click="Search" Name="SearchButton" />
+                            VerticalAlignment="Center" Margin="0,0,20,0" DockPanel.Dock="Left">
+                    <TextBox Width="400" Margin="20 0 0 0 " Name="WidgetValue" />
+                    <Button Content="搜索" Margin="5 0 0 0 " HorizontalAlignment="Stretch" Click="Search"
+                            Name="WidgetSearchButton" />
                 </StackPanel>
                 <!-- 导出格式选择 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0"
@@ -105,9 +105,18 @@
 
         <!-- 内容 -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <UniformGrid x:Name="GridContentColumn" Rows="0" Columns="4" Margin="10 0 10 10"
-                         HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            </UniformGrid>
+            <StackPanel Name="WidgetStackPanelContent">
+                <UniformGrid x:Name="WidgetGridContentColumn" Rows="0" Columns="4" Margin="10 0 10 10"
+                             HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                </UniformGrid>
+                <TextBlock Foreground="#70FFFFFF" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Name="WidgetHint" IsVisible="False">再怎么找也是没有啦！！！</TextBlock>
+                <Button Name="WidgetSteamSelector" IsVisible="{Binding WidgetSteamSelectorIsVisible}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Svg Height="25" Width="25" Path="avares://WallpaperMedia/Assets/images/FeatherFolder.svg" />
+                        <TextBlock FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Text="读取Steam" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </ScrollViewer>
 
         <!-- 底部按钮 -->
@@ -117,14 +126,15 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             VerticalAlignment="Center" Margin="20,0,0,0" DockPanel.Dock="Left">
                     <TextBlock Text="输出目录:" VerticalAlignment="Center" Margin="0 0 5 0" />
-                    <TextBox Width="400" Name="OutputDirectory" />
+                    <TextBox Width="400" Name="WidgetOutputDirectory" />
                     <Button Content="..." Width="30" Click="FileSelector" />
                 </StackPanel>
 
                 <!-- 导出选中项 -->
                 <Button Content="导出选中项"
                         Command="{Binding ExportOriginalFile}"
-                        HorizontalAlignment="Right" DockPanel.Dock="Right" Name="ExportButton" IsEnabled="{Binding _IsButtonEnabled}"/>
+                        HorizontalAlignment="Right" DockPanel.Dock="Right" Name="WidgetExportButton"
+                        IsEnabled="{Binding WidgetIsButtonEnabled}" />
             </DockPanel>
         </Grid>
     </Grid>

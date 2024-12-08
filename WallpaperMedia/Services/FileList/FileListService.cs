@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using WallpaperMedia.Configs;
+using WallpaperMedia.CustomException;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Utils;
 
@@ -17,7 +18,7 @@ public class FileListService : IFileListService
         string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
         if (folderPath == null)
         {
-            throw new Exception("未找到stema");
+            throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
         }
 
         folderPath = Path.Combine(folderPath, FileConfig.WallpaperPath);
@@ -34,7 +35,7 @@ public class FileListService : IFileListService
     private List<FileInfoModel> ParseFile(string folderPath)
     {
         if (!Directory.Exists(folderPath))
-            throw new Exception("未找到Wallpaper Engine下载壁纸");
+            throw new WallpaperPathError("未找到Wallpaper Engine下载壁纸", WallpaperPathErrorEnum.Wallpapers);
 
         List<FileInfoModel> fileInfos = new List<FileInfoModel>();
 

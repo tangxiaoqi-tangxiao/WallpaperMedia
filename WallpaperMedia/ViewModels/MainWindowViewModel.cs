@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using WallpaperMedia.Configs;
+using WallpaperMedia.CustomException;
 using WallpaperMedia.Models.FileListService;
 using WallpaperMedia.Services;
 using WallpaperMedia.Services.RePKG;
@@ -14,20 +15,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IFileListService _fileListService;
     private readonly IRePKGService _rePKGService;
-
-    private bool IsButtonEnabled = true;
-
-    public bool _IsButtonEnabled
-    {
-        get => IsButtonEnabled;
-        set
-        {
-            IsButtonEnabled = value;
-            //更新UI
-            OnPropertyChanged();
-        }
-    }
-
+    
     public MainWindowViewModel(IFileListService fileListService, IRePKGService rePKGService)
     {
         _fileListService = fileListService;
@@ -35,6 +23,29 @@ public partial class MainWindowViewModel : ViewModelBase
 
         //初始化
         Initialize();
+    }
+    
+    private bool _widgetIsButtonEnabled = true;
+    private bool _widgetSteamSelectorIsVisible = true;
+    public bool WidgetIsButtonEnabled
+    {
+        get => _widgetIsButtonEnabled;
+        set
+        {
+            _widgetIsButtonEnabled = value;
+            //更新UI
+            OnPropertyChanged();
+        }
+    }
+
+    public bool WidgetSteamSelectorIsVisible
+    {
+        get => _widgetSteamSelectorIsVisible;
+        set
+        {
+            _widgetSteamSelectorIsVisible = value;
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>
@@ -44,7 +55,22 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void Initialize()
     {
-        _FileItems = _fileListService.FileInfoList();
+        try
+        {
+            _FileItems = _fileListService.FileInfoList();
+        }
+        catch (WallpaperPathError e)
+        {
+            if (e.ErrorType == WallpaperPathErrorEnum.Steam)
+            {
+                ShowSteamSelector(true);
+            }
+            else
+            {
+                ShowSteamSelector(false);
+            }
+        }
+        
         //设置输出路径
         SetOutputDirectory();
     }
@@ -54,7 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            _IsButtonEnabled = false;
+            WidgetIsButtonEnabled = false;
             List<FileInfoModel> paths = new();
             foreach (var item in _FileItems)
             {
@@ -88,7 +114,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            _IsButtonEnabled = true;
+            WidgetIsButtonEnabled = true;
         }
     }
 
@@ -99,5 +125,10 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             GlobalConfig.config.OutputDirectory = _fileListService.GetDownloadsPath();
         }
+    }
+
+    void ShowSteamSelector(bool isShow)
+    {
+        WidgetSteamSelectorIsVisible = true;
     }
 }
