@@ -110,7 +110,7 @@
                              HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 </UniformGrid>
                 <TextBlock Foreground="#70FFFFFF" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Name="WidgetHint" IsVisible="False">再怎么找也是没有啦！！！</TextBlock>
-                <Button Name="WidgetSteamSelector" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="False">
+                <Button Name="WidgetSteamSelector" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="False" Click="SteamFolderSelector">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Svg Height="25" Width="25" Path="avares://WallpaperMedia/Assets/images/FeatherFolder.svg" />
                         <TextBlock FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Text="读取Steam" />

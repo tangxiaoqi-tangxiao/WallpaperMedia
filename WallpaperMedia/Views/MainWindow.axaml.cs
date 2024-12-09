@@ -57,6 +57,7 @@ public partial class MainWindow : Window
         this.SizeChanged += OnSizeChanged;
         // 加载完成
         this.Loaded += MainWindow_Loaded;
+        // 监听输出文件路径的输入框
         WidgetOutputDirectory.TextChanged += OnTextChanged;
     }
 
@@ -67,18 +68,9 @@ public partial class MainWindow : Window
         {
             //初始化ViewModel
             _ViewModel.Initialize();
-
-            // 加载输出文件路径
-            WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
             
-            _isLoading = true;
-            
-            //没有数据展示提示词
-            if (_ViewModel._FileItems.Count == 0)
-                ShowHint(true);
-            
-            //加载数据
-            BuildContentComponent(_ViewModel._FileItems);
+            //加载展示数据
+            LoadDisplayData();
         }
         catch (WallpaperPathError mError)
         {
@@ -86,6 +78,10 @@ public partial class MainWindow : Window
             {
                 ShowSteamSelector(true);
             }
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
         }
     }
 
@@ -269,11 +265,14 @@ public partial class MainWindow : Window
         
         if (folder.Count > 0)
         {
-            string folderPath = Path.Combine(folder[0].Path.LocalPath,"steam.exe");
+            string folderPath = folder[0].Path.LocalPath;
+            string steamPath = Path.Combine(folderPath,"steam.exe");
             //判断该文件夹是否存在Steam
-            if (File.Exists(folderPath))
+            if (File.Exists(steamPath))
             {
                 GlobalConfig.config.SteamPath = folderPath;
+                _ViewModel.Initialize();
+                LoadDisplayData();
             }
             else
             {
@@ -348,6 +347,7 @@ public partial class MainWindow : Window
     {
         //显示控件
         WidgetSteamSelector.IsVisible = isShow;
+        
         if (isShow)
         {
             IsEnabledComponent(false);
@@ -371,5 +371,23 @@ public partial class MainWindow : Window
         WidgetExportButton.IsEnabled = isEnabled;
         WidgetSearchButton.IsEnabled = isEnabled;
         ComboBox.IsEnabled = isEnabled;
+    }
+
+    private void LoadDisplayData()
+    {
+        ShowSteamSelector(false);
+        
+        // 加载输出文件路径
+        WidgetOutputDirectory.Text = GlobalConfig.config.OutputDirectory;
+            
+        _isLoading = true;
+            
+        //没有数据展示提示词
+        if (_ViewModel._FileItems.Count == 0)
+            ShowHint(true);
+        else
+            ShowHint(false);
+        //加载数据
+        BuildContentComponent(_ViewModel._FileItems);
     }
 }

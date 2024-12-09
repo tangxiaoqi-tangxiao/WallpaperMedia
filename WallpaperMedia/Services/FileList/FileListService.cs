@@ -17,7 +17,7 @@ public class FileListService : IFileListService
     {
         if (string.IsNullOrWhiteSpace(GlobalConfig.config.SteamPath))
         {
-            string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
+            string folderPath = _regeditHelp.Read("", "SteamPath0")?.ToString().Replace('/', '\\');
             if (folderPath == null)
             {
                 throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
