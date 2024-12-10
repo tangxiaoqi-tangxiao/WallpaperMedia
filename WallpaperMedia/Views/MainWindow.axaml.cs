@@ -276,7 +276,7 @@ public partial class MainWindow : Window
             }
             else
             {
-                Console.WriteLine("文件不存在。");
+                WidgetHint2.IsVisible = true;
             }
         }
     }
@@ -362,7 +362,8 @@ public partial class MainWindow : Window
 
         //隐藏控件
         WidgetGridContentColumn.IsVisible = !isShow;
-        WidgetHint.IsVisible = !isShow;
+        WidgetHint.IsVisible = false;
+        WidgetHint2.IsVisible = false;
     }
     
     //启用或禁用组件
