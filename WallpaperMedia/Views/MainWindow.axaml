@@ -105,7 +105,7 @@
 
         <!-- 内容 -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="WidgetStackPanelContent">
+            <StackPanel Name="WidgetStackPanelContent" Orientation="Vertical">
                 <UniformGrid x:Name="WidgetGridContentColumn" Rows="0" Columns="4" Margin="10 0 10 10"
                              HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 </UniformGrid>
@@ -114,6 +114,7 @@
                            Name="WidgetHint" IsVisible="False">
                     再怎么找也是没有啦！！！
                 </TextBlock>
+
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Button Name="WidgetSteamSelector" VerticalAlignment="Center" HorizontalAlignment="Center"
                             IsVisible="False" Click="SteamFolderSelector">
@@ -123,7 +124,8 @@
                                        Text="读取Steam" />
                         </StackPanel>
                     </Button>
-                    <TextBlock Margin="0 10 0 0 " Foreground="Red" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <TextBlock Margin="0 10 0 0 " Foreground="Red" FontSize="15" HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
                                Name="WidgetHint2" IsVisible="False">
                         请选择Steam文件夹，非Steam文件夹无法使用
                     </TextBlock>

@@ -17,11 +17,18 @@ public class FileListService : IFileListService
     {
         if (string.IsNullOrWhiteSpace(GlobalConfig.config.SteamPath))
         {
-            string folderPath = _regeditHelp.Read("", "SteamPath0")?.ToString().Replace('/', '\\');
+            string folderPath = _regeditHelp.Read("", "SteamPath")?.ToString().Replace('/', '\\');
             if (folderPath == null)
             {
                 throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
             }
+            string steamPath = Path.Combine(folderPath,"steam.exe");
+            //判断该文件夹是否存在Steam
+            if (!File.Exists(steamPath))
+            {
+                throw new WallpaperPathError("未找到stema", WallpaperPathErrorEnum.Steam);
+            }
+            
             GlobalConfig.config.SteamPath = folderPath;
         }
 
