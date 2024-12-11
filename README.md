@@ -8,4 +8,4 @@ WallpaperMedia 是一个基于[RePKG](https://github.com/notscuffed/repkg)的开
 
 软件自动查找壁纸位置，打开即用无需配置任何东西
 
-[下载地址](https://github.com/tangxiaoqi-tangxiao/WallpaperMedia/releases/tag/v1.0.0)
+[下载地址](https://github.com/tangxiaoqi-tangxiao/WallpaperMedia/releases)

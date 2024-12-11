@@ -1,0 +1,37 @@
+﻿name: Windows打包
+
+#on:
+#  push:
+#    tags:
+#      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+      
+    steps:
+      # Step 1: 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: 配置 .NET 9 环境
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0
+          
+      - name: 打印当前文件夹
+        run: dir
+      
+      # Step 3: 恢复依赖项
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      # Step 4: 构建项目
+      - name: Build project
+        run: dotnet publish WallpaperMedia\WallpaperMedia.csproj /p:PublishProfile=WallpaperMedia\Properties\PublishProfiles\FolderProfile.pubxml
