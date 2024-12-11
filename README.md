@@ -1,21 +1,11 @@
-MIT License
+# WallpaperMedia
 
-Copyright (c) 2024 Pintree.io
+WallpaperMedia 是一个基于[RePKG](https://github.com/notscuffed/repkg)的开源项目，用于解包Wallpaper的壁纸文件。
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+![软件界面](.github/images/0e6d2e73-1c52-4257-9ff5-99a6a6696ecd.png)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+该项目为不擅长命令行的同学提供了GUI图形化界面，方便操作查找
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+软件自动查找壁纸位置，打开即用无需配置任何东西
+
+[下载地址]()

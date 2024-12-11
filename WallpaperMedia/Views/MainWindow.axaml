@@ -6,7 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WallpaperMedia.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/WallpaperMedia_Icon.ico"
         Title="WallpaperMedia"
         Background="#222222"
         ExtendClientAreaToDecorationsHint="False"
