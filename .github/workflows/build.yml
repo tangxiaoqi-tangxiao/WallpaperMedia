@@ -1,14 +1,14 @@
 ﻿name: Windows打包
 
-#on:
-#  push:
-#    tags:
-#      - 'v[0-9]+.[0-9]+.[0-9]+'
-
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+#on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   build:
@@ -41,16 +41,16 @@ jobs:
         run: Compress-Archive -Path .\WallpaperMedia\bin\Release\net9.0\publish\win-x64\* -DestinationPath Win_x64.zip
       
       # Step 5: 上传文件到Release
-#      - name: Create GitHub Release
-#        uses: softprops/action-gh-release@v2
-#        if: startsWith(github.ref, 'refs/tags/')
-#        with:
-#          files: Win_x64.zip
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: build-artifacts # 自定义的上传名称
-          path: Win_x64.zip          # 上传的文件或目录路径
+          files: Win_x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Upload Build Artifacts
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: build-Win_x64       # 自定义的上传名称
+#          path: Win_x64.zip         # 上传的文件或目录路径
