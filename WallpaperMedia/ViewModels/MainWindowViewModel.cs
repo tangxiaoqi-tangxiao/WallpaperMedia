@@ -33,10 +33,8 @@ public partial class MainWindowViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
-
-    /// <summary>
-    /// 获取<see cref="ToDoItem"/>的集合，该集合允许添加和删除项目
-    /// </summary>
+    
+    //壁纸集合
     public List<FileInfoModel> _FileItems { get; set; } = new();
 
     public void Initialize()

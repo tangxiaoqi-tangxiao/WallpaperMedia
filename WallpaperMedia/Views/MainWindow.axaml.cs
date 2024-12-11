@@ -78,6 +78,8 @@ public partial class MainWindow : Window
             {
                 ShowSteamSelector(true);
             }
+            //加载展示数据
+            LoadDisplayData();
         }
         catch (Exception err)
         {
