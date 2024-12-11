@@ -35,3 +35,15 @@ jobs:
       # Step 4: 构建项目
       - name: Build project
         run: dotnet publish WallpaperMedia\WallpaperMedia.csproj /p:PublishProfile=WallpaperMedia\Properties\PublishProfiles\FolderProfile.pubxml
+        
+      # Step 4: 压缩文件
+      - name: Compression
+        run: Compress-Archive -Path .\WallpaperMedia\bin\Release\net9.0\publish\win-x64\* -DestinationPath Win_x64.zip
+      
+      # Step 5: 上传文件到Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Win_x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
